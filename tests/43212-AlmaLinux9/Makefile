@@ -9,8 +9,7 @@ var/sge.iso : var/$(Rhel)-x86_64-minimal.iso var/id_ed25519
 	sed -i "s#timeout 600#timeout 1#; \
 		s#rd.live.check quiet#inst.ks=cdrom:/ks.cfg#" \
 		$@.d/isolinux/isolinux.cfg
-	m4 -D "m4SshPubKey=$$(cat var/id_ed25519.pub)" \
-		-D m4Rhel=$(Rhel) lib/ks.cfg.m4 > $@.d/ks.cfg
+	m4 -D "m4SshPubKey=$$(cat var/id_ed25519.pub)" lib/ks.cfg.m4 > $@.d/ks.cfg
 	genisoimage -quiet -l -r -J -V \
 		"$$(isoinfo -d -i $< | grep 'Volume id: ' |cut -c 12-)" \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
@@ -21,6 +20,6 @@ var/$(Rhel)-x86_64-minimal.iso :
 ifeq ($(Rhel),AlmaLinux9)
 	wget -qcO $@.tmp -c http://mirror.vtti.vt.edu/almalinux/9/isos/x86_64/AlmaLinux-9.7-x86_64-minimal.iso
 else
-	wget -qcO $@.tmp -c http://download.rockylinux.org/pub/rocky/9/isos/x86_64/Rocky-9.6-x86_64-minimal.iso
+	wget -qcO $@.tmp -c http://download.rockylinux.org/pub/rocky/9/isos/x86_64/Rocky-9.7-x86_64-minimal.iso
 endif
 	mv $@.tmp $@
