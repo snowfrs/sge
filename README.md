@@ -31,14 +31,17 @@ SGE has proven to be stable, reliable, and well-suited for small to medium-sized
 ### Improvements
 
 - **musl libc compatibility**
+
   Ported `glibc rresvport` to work with [musl libc](https://musl.libc.org/).
   Tested on [Void Linux (musl)](https://voidlinux.org/) and [Alpine Linux](https://www.alpinelinux.org/).
 
 - **SystemD job submission support**
+
   Jobs can now be submitted via SystemD, allowing enforcement of memory and CPU limits via kernel cgroups.
   Thanks to [fretn](https://github.com/fretn/sge) and [ondrejv2](https://github.com/ondrejv2/sge)!
 
 - **CMake build support**
+
   Added CMake for easier long-term maintenance.
   On an 15-year old 8-core machine:
   - 38 seconds with CMake (parallel compile & install)
@@ -46,23 +49,29 @@ SGE has proven to be stable, reliable, and well-suited for small to medium-sized
   - 377 seconds with `makepkg`
 
 - **Systemd installation fix**
+
   Fixed a permission error (introduced with systemd 241 in 2019) when installing SGE as a non-root user.
 
 - **OpenSSL compatibility**
+
   Updated for the latest OpenSSL versions.
 
 - **Compiler warnings resolved**
+
   All C compilation warnings fixed on Arch Linux and Void Linux.
   Issues were caused by stricter GCC, new SSL/GLIBC, and obsolete/deprecated functions (`sigignore`, `readdir_r`, etc.).
 
 - **Service name cleanup**
+
   Changed underscores to hyphens in service names (`sge_qmaster/sge_execd` → `sge-qmaster/sge-execd`).
   This avoids modifying `/etc/services` manually.
 
 - **Init system support**
+
   Supports both `runit` (Void Linux) and `systemd` (other distros).
 
 - **Versioning**
+
   Version numbers now correspond to the commit hash of this GitHub repository.
 
 - **[5 keystrokes to setup a demo cluster on any Linux machine without root privilege](tests/5-keystrokes-to-setup-a-cluster-without-root-privilege/)**
@@ -73,17 +82,17 @@ SGE has proven to be stable, reliable, and well-suited for small to medium-sized
 ## Requirements
 ### tested with all the Linux distributions below, patched up to the specified date
 
-- **Arch Linux**, 2026-08-22
+- **Arch Linux**, 2026-09-06
 ```
 pacman -Sy --needed cmake db gcc git hwloc inetutils m4 make man pkgconf vi
 ```
 
-- **Void Linux**, 2026-08-22, x86\_64, glibc/musl
+- **Void Linux**, 2026-09-06, x86\_64, glibc/musl
 ```
 xbps-install cmake gcc git hwloc libhwloc-devel libtirpc-devel m4 make ncurses-devel openssl-devel pam-devel
 ```
 
-- **Alpine Linux**, 2026-08-22, x86\_64, Edge
+- **Alpine Linux**, 2026-09-06, x86\_64, Edge
 ```
 apk add cmake db-dev g++ gcc git hwloc-dev libtirpc-dev libxt-dev linux-pam-dev m4 make ncurses-dev openssl-dev procps
 #Due to the conflict with usr/include/libintl.h owned by both gettext-dev and musl-libintl
@@ -91,7 +100,7 @@ apk fetch musl-libintl
 tar -C / -xf musl-libintl*.apk usr/include/libintl.h
 ```
 
-- **AlmaLinux 10.2**, 2026-08-22, with SELinux set to permissive
+- **AlmaLinux 10.2**, 2026-09-06, with SELinux set to permissive
 ```
 dnf group install "Development Tools"
 dnf install cmake hwloc-devel ncurses-devel openssl-devel pam-devel rsync systemd-devel wget
@@ -100,7 +109,7 @@ dnf install https://dl.fedoraproject.org/pub/epel/10/Everything/x86_64/Packages/
 dnf install https://repo.almalinux.org/almalinux/10/CRB/x86_64/os/Packages/libtirpc-devel-1.3.5-1.el10.x86_64.rpm
 ```
 
-- **Rocky 10.2**, 2026-08-22, with SELinux set to permissive
+- **Rocky 10.2**, 2026-09-06, with SELinux set to permissive
 ```
 dnf group install "Development Tools"
 dnf install cmake hwloc-devel ncurses-devel openssl-devel pam-devel rsync systemd-devel wget
@@ -109,38 +118,38 @@ dnf install https://dl.fedoraproject.org/pub/epel/10/Everything/x86_64/Packages/
 dnf install https://dl.rockylinux.org/pub/rocky/10/CRB/x86_64/os/Packages/l/libtirpc-devel-1.3.5-1.el10.x86_64.rpm
 ```
 
-- **AlmaLinux 9.8**, 2026-08-22, with SELinux set to permissive
+- **AlmaLinux 9.8**, 2026-09-06, with SELinux set to permissive
 ```
 dnf group install "Development Tools"
 dnf install cmake hwloc-devel libdb-devel ncurses-devel openssl-devel pam-devel rsync systemd-devel wget
 dnf install https://repo.almalinux.org/almalinux/9/CRB/x86_64/os/Packages/libtirpc-devel-1.3.3-9.el9.x86_64.rpm
 ```
 
-- **Rocky 9.8**, 2026-08-22, with SELinux set to permissive
+- **Rocky 9.8**, 2026-09-06, with SELinux set to permissive
 ```
 dnf group install "Development Tools"
 dnf install cmake hwloc-devel libdb-devel ncurses-devel openssl-devel pam-devel rsync systemd-devel wget
 dnf install https://dl.rockylinux.org/pub/rocky/9/CRB/x86_64/os/Packages/l/libtirpc-devel-1.3.3-9.el9.x86_64.rpm
 ```
 
-- **AlmaLinux 8.10** and **Rocky 8.10**, 2026-08-22, with SELinux set to permissive
+- **AlmaLinux 8.10** and **Rocky 8.10**, 2026-09-06, with SELinux set to permissive
 ```
 dnf group install "Development Tools"
 dnf --enablerepo=powertools install cmake hwloc-devel libdb-devel libtirpc-devel ncurses-devel openssl-devel pam-devel rsync systemd-devel wget
 ```
 
-- **Debian Trixie/Bookworm/Bullseye**, 2026-08-22
+- **Debian Trixie/Bookworm/Bullseye**, 2026-09-06
 ```
 apt install build-essential cmake git libdb5.3-dev libhwloc-dev libncurses-dev libpam0g-dev libssl-dev libsystemd-dev libtirpc-dev libxext-dev pkgconf rsync
 ```
 
-- **Ubuntu Server 26.04, 24.04, 22.04**, 2026-08-22
+- **Ubuntu Server 26.04, 24.04, 22.04**, 2026-09-06
 ```
 apt-get install build-essential cmake git libdb5.3-dev libhwloc-dev libncurses-dev libpam0g-dev libssl-dev libsystemd-dev libtirpc-dev libxext-dev pkgconf
 
 ```
 
-- **openSUSE Leap**, 2026-08-22
+- **openSUSE Leap**, 2026-09-06
 ```
 zypper -n addrepo http://download.opensuse.org/distribution/leap/15.6/repo/oss/ oss
 zypper -n install cmake gcc gcc-c++ git hwloc-devel libdb-4_8-devel libtirpc-devel libXext-devel m4 ncurses-devel openssl-devel pam-devel pkgconf rsync systemd-devel wget
