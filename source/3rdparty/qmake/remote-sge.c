@@ -1824,7 +1824,7 @@ int start_remote_job_p (int first_p)
 */
 
 static int is_recursive_make(const char *argv_0) {
-   char *substring;
+   const char *substring;
 
    substring = strstr(argv_0, program_name);
    if(substring != NULL) {

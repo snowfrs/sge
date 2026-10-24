@@ -560,7 +560,7 @@ static char *sge_infotext_string_replace(dstring* tmp_buf, const char *arg, cons
    sge_dstring_copy_string(&arg_copy, arg);
    p2 = sge_dstring_get_string(&arg_copy);
 
-   p1 = strstr(p2, what);
+   p1 = (char *)strstr(p2, what);
    if (p1 == NULL) {
       sge_dstring_copy_string(tmp_buf,arg);
       sge_dstring_free(&arg_copy);
@@ -581,7 +581,7 @@ static char *sge_infotext_string_replace(dstring* tmp_buf, const char *arg, cons
          return (char *)sge_dstring_get_string(tmp_buf);
       } 
 
-      p1 = strstr(p2, what);
+      p1 = (char *)strstr(p2, what);
    }
    sge_dstring_append(tmp_buf,p2);
    sge_dstring_free(&arg_copy);

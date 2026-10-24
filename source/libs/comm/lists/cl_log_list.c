@@ -62,8 +62,8 @@ static cl_log_list_elem_t* cl_log_list_get_last_elem(cl_raw_list_t* list_p, cl_l
 static int cl_log_list_add_log(cl_raw_list_t* list_p, const char* thread_name, int line, const char* function_name, const char* module_name, int thread_id, int thread_state, cl_log_t log_type, const char* message , const char* parameter) { /* CR check */
    cl_log_list_elem_t* new_elem = NULL;
    int module_length = 0;
-   char* mod_name_start1 = NULL;  
-   char* mod_name_start = NULL;  
+   const char* mod_name_start1 = NULL;
+   const char* mod_name_start = NULL;
 
 
    if (list_p == NULL || thread_name == NULL || function_name == NULL || module_name == NULL || message == NULL) {

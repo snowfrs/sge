@@ -1784,7 +1784,7 @@ t_search(struct Strbuf *word, COMMAND command, int looking, int list_max,
 static void
 extract_dir_and_name(const Char *path, struct Strbuf *dir, Char **name)
 {
-    Char *p;
+    const Char *p;
 
     p = Strrchr(path, '/');
 #ifdef WINNT_NATIVE

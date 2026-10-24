@@ -1231,7 +1231,7 @@ int sub_command
          char *del_pos = NULL;
          job_id_str = lGetPosString(jep, job_name_pos);
          job_id_str++;
-         del_pos = strchr(job_id_str, JOB_NAME_DEL);
+         del_pos = (char *)strchr(job_id_str, JOB_NAME_DEL);
          *del_pos = '\0';
          del_pos++;
 

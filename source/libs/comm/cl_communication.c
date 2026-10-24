@@ -1917,7 +1917,7 @@ static int cl_com_dup_host(char** host_dest, const char* source, cl_host_resolve
 
    int retval = CL_RETVAL_OK;
    bool is_static_buffer = false;
-   char* the_dot = NULL;
+   const char* the_dot = NULL;
 
    if (host_dest == NULL || source == NULL) {
       return CL_RETVAL_PARAMS;

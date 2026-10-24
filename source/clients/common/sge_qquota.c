@@ -81,7 +81,7 @@ typedef struct {
 
 static bool get_all_lists(sge_gdi_ctx_class_t *ctx, lList **rqs_l, lList **centry_l, lList **userset_l, lList **hgroup_l, lList **exechost_l, lList *hostref_list, lList **alpp);
 
-static char *qquota_get_next_filter(stringT filter, const char *cp);
+const static char *qquota_get_next_filter(stringT filter, const char *cp);
 static bool qquota_print_out_rule(lListElem *rule, dstring rule_name, const char *limit_name,
                                   const char *usage_value, const char *limit_value, qquota_filter_t filter,
                                   report_handler_t* report_handler, lList *printed_rules, lList **alpp);
@@ -239,7 +239,7 @@ bool qquota_output(sge_gdi_ctx_class_t *ctx, lList *host_list, lList *resource_m
                                     for_each(rue_elem, rue_list) {
                                        u_long32 dominant = 0;
                                        const char *rue_name = lGetString(rue_elem, RUE_name);
-                                       char *cp = NULL;
+                                       const char *cp = NULL;
                                        stringT user, project, pe, queue, host;
                                        dstring limit_str = DSTRING_INIT; 
                                        dstring value_str = DSTRING_INIT;
@@ -555,9 +555,9 @@ get_all_lists(sge_gdi_ctx_class_t *ctx, lList **rqs_l, lList **centry_l, lList *
 *     MT-NOTE: qquota_get_next_filter() is not MT safe 
 *
 *******************************************************************************/
-static char *qquota_get_next_filter(stringT filter, const char *cp)
+static const char *qquota_get_next_filter(stringT filter, const char *cp)
 {
-   char *ret = NULL;
+   const char *ret = NULL;
 
    ret = strchr(cp, '/')+1;
    if (ret - cp < MAX_STRING_SIZE && ret - cp > 1) { 

@@ -105,7 +105,7 @@ int attr_mod_procedure( lList **alpp, lListElem *qep, lListElem *new_ep, int nm,
 
       s = lGetString(qep, nm);
       if (s) {
-         char *t; 
+         const char *t;
          const char *script = s;
 
          /* skip user name */

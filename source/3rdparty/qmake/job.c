@@ -403,7 +403,7 @@ is_bourne_compatible_shell (const char *path)
 
   /* find the rightmost '/' or '\\' */
   const char *name = strrchr (path, '/');
-  char *p = strrchr (path, '\\');
+  const char *p = strrchr (path, '\\');
 
   if (name && p)    /* take the max */
     name = (name > p) ? name : p;

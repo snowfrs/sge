@@ -612,7 +612,7 @@ int main(int argc, char **argv)
       if (!has_domain) {
          for_each(qref_pattern, queueref_list) {
             dstring qi_name = DSTRING_INIT;
-            char *tmp_str = NULL;
+            const char *tmp_str = NULL;
             name = lGetString(qref_pattern, QR_name); 
            
             sge_dstring_copy_string(&qi_name, name); 

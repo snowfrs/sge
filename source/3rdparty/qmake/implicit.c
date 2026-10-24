@@ -532,7 +532,7 @@ pattern_search (struct file *file, int archive,
                 {
                   dep_simple = *dep;
                   dep_simple.next = 0;
-                  p = strchr (nptr, '%');
+                  p = (char *)strchr (nptr, '%');
                   if (p == 0)
                     dep_simple.name = nptr;
                   else

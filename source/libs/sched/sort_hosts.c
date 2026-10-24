@@ -150,7 +150,7 @@ double scaled_mixed_load(const char* load_formula, lListElem *global,
    char *ptr = NULL;
    char *ptr2 = NULL;
    char *par_name = NULL;
-   char *op_ptr=NULL;
+   const char *op_ptr=NULL;
 
    double val=0, val2=0;
    double load=0;

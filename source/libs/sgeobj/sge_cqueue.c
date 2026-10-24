@@ -297,7 +297,7 @@ cqueue_name_split(const char *name,
 *******************************************************************************/
 char* cqueue_get_name_from_qinstance(const char *queue_instance)
 {
-   char *at_sign = NULL;
+   const char *at_sign = NULL;
    char *cqueue = NULL; 
 
    if ((at_sign = strchr(queue_instance, '@'))) {

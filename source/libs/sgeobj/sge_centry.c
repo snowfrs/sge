@@ -874,7 +874,7 @@ lList *
 centry_list_parse_from_string(lList *complex_attributes,
                               const char *str, bool check_value) 
 {
-   const char *cp;
+   char *cp;
    struct saved_vars_s *context = NULL;
 
    DENTER(TOP_LAYER, "centry_list_parse_from_string");
@@ -888,7 +888,7 @@ centry_list_parse_from_string(lList *complex_attributes,
    }
 
    /* str now points to the attr=value pairs */
-   while ((cp = sge_strtok_r(str, ", ", &context))) {
+   while ((cp = (char *)sge_strtok_r(str, ", ", &context))) {
       lListElem *complex_attribute = NULL;
       const char *attr = NULL;
       char *value = NULL;

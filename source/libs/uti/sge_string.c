@@ -77,7 +77,7 @@
 ******************************************************************************/
 const char *sge_basename(const char *name, int delim) 
 {
-   char *cp;
+   const char *cp;
 
    DENTER(BASIS_LAYER, "sge_basename");
 
@@ -182,7 +182,8 @@ const char *sge_jobname(const char *name) {
 ******************************************************************************/
 char *sge_dirname(const char *name, int delim) 
 {
-   char *cp, *cp2;
+   const char *cp;
+   char *cp2;
 
    DENTER(BASIS_LAYER, "sge_dirname");
 

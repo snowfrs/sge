@@ -3582,7 +3582,7 @@ static bool sconf_eval_set_monitoring(lList *param_list, lList **answer_list, co
 static bool sconf_eval_set_duration_offset(lList *param_list, lList **answer_list, const char* param)
 {
    u_long32 uval;
-   char *s;
+   const char *s;
 
    if (!(s=strchr(param, '=')) ||
        !extended_parse_ulong_val(NULL, &uval, TYPE_TIM, ++s, NULL, 0, 0, true)) {
@@ -3611,7 +3611,7 @@ static bool sconf_eval_set_duration_offset(lList *param_list, lList **answer_lis
 *******************************************************************************/
 static bool sconf_eval_set_pe_range_alg(lList *param_list, lList **answer_list, const char* param)
 {
-   char *s;
+   const char *s;
 
    DENTER(TOP_LAYER, "sconf_eval_set_monitoring");
    

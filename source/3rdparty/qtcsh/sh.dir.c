@@ -205,7 +205,7 @@ skipargs(Char ***v, const char *dstr, const char *str)
 	if (*(s = &((*n)[1])) == '\0')	/* test for bare "-" argument */
 	    dflag |= DIR_OLD;
 	else {
-	    char *p;
+	    const char *p;
 	    while (*s != '\0')	/* examine flags */
 	    {
 		if ((p = strchr(dstr, *s++)) != NULL)

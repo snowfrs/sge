@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -xEe
+git config --global --add safe.directory /root/sge
 cd sge
 cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/opt/sge
 cmake --build build

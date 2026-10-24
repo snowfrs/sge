@@ -1,33 +1,33 @@
 /*___INFO__MARK_BEGIN__*/
 
 /*************************************************************************
- * 
+ *
  *  The Contents of this file are made available subject to the terms of
  *  the Sun Industry Standards Source License Version 1.2
- * 
+ *
  *  Sun Microsystems Inc., March, 2001
- * 
- * 
+ *
+ *
  *  Sun Industry Standards Source License Version 1.2
  *  =================================================
  *  The contents of this file are subject to the Sun Industry Standards
  *  Source License Version 1.2 (the "License"); You may not use this file
  *  except in compliance with the License. You may obtain a copy of the
  *  License at http://gridengine.sunsource.net/Gridengine_SISSL_license.html
- * 
+ *
  *  Software provided under this License is provided on an "AS IS" basis,
  *  WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING,
  *  WITHOUT LIMITATION, WARRANTIES THAT THE SOFTWARE IS FREE OF DEFECTS,
  *  MERCHANTABLE, FIT FOR A PARTICULAR PURPOSE, OR NON-INFRINGING.
  *  See the License for the specific provisions governing your rights and
  *  obligations concerning the Software.
- * 
+ *
  *   The Initial Developer of the Original Code is: Sun Microsystems, Inc.
- * 
+ *
  *   Copyright: 2001 by Sun Microsystems, Inc.
- * 
+ *
  *   All Rights Reserved.
- * 
+ *
  *   Portions of this code are Copyright 2011 Univa Inc.
  *   Copyright (C) 2011 Dave Love, University of Liverpool
  *
@@ -43,7 +43,7 @@
 #include "uti/sge_string.h"
 #include "uti/sge_log.h"
 #include "uti/sge_binding_hlp.h"
-#include "uti/msg_utilib.h" 
+#include "uti/msg_utilib.h"
 #include "uti/sge_mtutil.h"
 #include "uti/sge_stdlib.h"
 
@@ -51,21 +51,21 @@ static bool is_digit(const char* position, const char stopchar);
 
 /****** sge_binding_hlp/parse_binding_parameter_string() ***********************
 *  NAME
-*     parse_binding_parameter_string() -- Parses binding parameter string. 
+*     parse_binding_parameter_string() -- Parses binding parameter string.
 *
 *  SYNOPSIS
-*     bool parse_binding_parameter_string(const char* parameter, u_long32* 
-*     type, dstring* strategy, int* amount, int* stepsize, int* firstsocket, 
-*     int* firstcore, dstring* socketcorelist, dstring* error) 
+*     bool parse_binding_parameter_string(const char* parameter, u_long32*
+*     type, dstring* strategy, int* amount, int* stepsize, int* firstsocket,
+*     int* firstcore, dstring* socketcorelist, dstring* error)
 *
 *  FUNCTION
 *     Parses binding parameter string and returns the values of the parameter.
 *     Please check output values in dependency of the strategy string.
 *
 *  INPUTS
-*     const char* parameter   - binding parameter string 
+*     const char* parameter   - binding parameter string
 *
-*  OUTPUT 
+*  OUTPUT
 *     u_long32* type          - type of binding (pe = 0| env = 1|set = 2)
 *     dstring* strategy       - binding strategy string
 *     int* amount             - number of cores to bind to
@@ -79,11 +79,11 @@ static bool is_digit(const char* position, const char stopchar);
 *     bool - true in case parsing was successful false in case of errors
 *
 *  NOTES
-*     MT-NOTE: parse_binding_parameter_string() is MT safe 
+*     MT-NOTE: parse_binding_parameter_string() is MT safe
 *
 *******************************************************************************/
-bool parse_binding_parameter_string(const char* parameter, binding_type_t* type, 
-      dstring* strategy, int* amount, int* stepsize, int* firstsocket, 
+bool parse_binding_parameter_string(const char* parameter, binding_type_t* type,
+      dstring* strategy, int* amount, int* stepsize, int* firstsocket,
       int* firstcore, dstring* socketcorelist, dstring* error)
 {
    bool retval = true;
@@ -93,14 +93,14 @@ bool parse_binding_parameter_string(const char* parameter, binding_type_t* type,
       sge_dstring_sprintf(error, "input parameter was NULL");
       return false;
    }
-   
+
    /* check the type [pe|env|set] (set is default) */
    if (strstr(parameter, "pe ") != NULL) {
       *type = BINDING_TYPE_PE;
    } else if (strstr(parameter, "env ") != NULL) {
       *type = BINDING_TYPE_ENV;
    } else {
-      *type = BINDING_TYPE_SET;   
+      *type = BINDING_TYPE_SET;
    }
 
    if (strstr(parameter, "linear") != NULL) {
@@ -117,13 +117,13 @@ bool parse_binding_parameter_string(const char* parameter, binding_type_t* type,
 
       if (*firstsocket == -2) {
          sge_dstring_sprintf(error, "couldn't parse socket number (linear)");
-         return false;     
+         return false;
       }
 
       if (*firstsocket < 0) {
          /* no socket number given, hence we don't scan for the core number */
          *firstcore = *firstsocket;
-      } else { 
+      } else {
          *firstcore   = binding_linear_parse_core_offset(parameter);
          if (*firstcore < 0) {
             /* there was an error during parsing the core number */
@@ -133,7 +133,7 @@ bool parse_binding_parameter_string(const char* parameter, binding_type_t* type,
       }
 
       if (*firstsocket < 0 && *firstcore < 0) {
-         /* couldn't find start <socket,core> -> must be determined 
+         /* couldn't find start <socket,core> -> must be determined
             automatically */
          sge_dstring_sprintf(strategy, "linear_automatic");
 
@@ -143,26 +143,26 @@ bool parse_binding_parameter_string(const char* parameter, binding_type_t* type,
       } else {
          sge_dstring_sprintf(strategy, "linear");
       }
-      
-      /* set step size to dummy */ 
+
+      /* set step size to dummy */
       *stepsize = -1;
-      
+
    } else if (strstr(parameter, "striding") != NULL) {
-      
+
       *amount = binding_striding_parse_number(parameter);
-      
+
       if (*amount  < 0) {
          /* couldn't parse number of cores */
          sge_dstring_sprintf(error, "couldn't parse amount (striding)");
          return false;
       }
-  
+
       *stepsize = binding_striding_parse_step_size(parameter);
 
       if (*stepsize < 0) {
-         /* no given stepsize does lead to stepsize 0 which will 
+         /* no given stepsize does lead to stepsize 0 which will
             be extended on the execution host to <number of cores per socket>.
-            When using a start socket,core the stepsize 0 has to be 
+            When using a start socket,core the stepsize 0 has to be
             included (binding striding:<amount>:0:<socket>,<core>.*/
          /* *stepsize = 0; */
          sge_dstring_sprintf(error, "couldn't parse stepsize (striding)");
@@ -188,25 +188,25 @@ bool parse_binding_parameter_string(const char* parameter, binding_type_t* type,
       }
 
       if (*firstsocket < 0 || *firstcore < 0) {
-         sge_dstring_sprintf(strategy, "striding_automatic");   
+         sge_dstring_sprintf(strategy, "striding_automatic");
 
          /* this might be an error on shepherd side only */
          *firstsocket = -1;
          *firstcore = -1;
       } else {
-         sge_dstring_sprintf(strategy, "striding");   
+         sge_dstring_sprintf(strategy, "striding");
       }
 
    } else if (strstr(parameter, "explicit") != NULL) {
 
       if (binding_explicit_has_correct_syntax(parameter, error) == false) {
-         retval = false;   
+         retval = false;
       } else {
          if (socketcorelist == NULL) {
             sge_dstring_sprintf(error, "%s", MSG_SYNTAX_DSTRINGBUG);
-            retval = false;  
+            retval = false;
          } else {
-            char* pos = strstr(parameter, "explicit"); 
+            const char* pos = strstr(parameter, "explicit");
             sge_dstring_copy_string(socketcorelist, pos);
             sge_dstring_sprintf(strategy, "explicit");
             pos = NULL;
@@ -214,18 +214,18 @@ bool parse_binding_parameter_string(const char* parameter, binding_type_t* type,
       }
 
    } else {
-      
+
       /* error: no valid strategy found */
-      sge_dstring_sprintf(error, "couldn't parse binding parameter (no strategy found)"); 
+      sge_dstring_sprintf(error, "couldn't parse binding parameter (no strategy found)");
       retval = false;
    }
-   
-  return retval; 
+
+  return retval;
 }
 
 
 /* ---------------------------------------------------------------------------*/
-/*                Beginning of generic parsing functions                      */ 
+/*                Beginning of generic parsing functions                      */
 /* ---------------------------------------------------------------------------*/
 
 /****** sge_binding_hlp/binding_linear_parse_number() **************************
@@ -237,11 +237,11 @@ bool parse_binding_parameter_string(const char* parameter, binding_type_t* type,
 *
 *  FUNCTION
 *    Parses a string in order to get the number of cores requested.
-* 
-*    The string has following format: "linear:<amount>[:<socket>,<core>]" 
+*
+*    The string has following format: "linear:<amount>[:<socket>,<core>]"
 *
 *  INPUTS
-*     const char* parameter - The first character of the string  
+*     const char* parameter - The first character of the string
 *
 *  RESULT
 *     int - if a value >= 0 then this reflects the number of cores
@@ -260,7 +260,7 @@ int binding_linear_parse_number(const char* parameter)
       "linear:<number>:<firstsocket>,<firstcore>" */
 
    if (parameter != NULL && strstr(parameter, "linear") != NULL) {
-      /* get number after linear: and before \0 or : */ 
+      /* get number after linear: and before \0 or : */
       /* Use an "infinite" value to signify using the number of slots
 	 to remain compatible, rather than changing types.  */
       if (sge_strtok(parameter, ":") == NULL)
@@ -290,24 +290,24 @@ int binding_linear_parse_number(const char* parameter)
 
 /****** sge_binding_hlp/bindingLinearParseSocketOffset() ***************************
 *  NAME
-*     bindingLinearParseSocketOffset() -- Get socket number of linear request. 
+*     bindingLinearParseSocketOffset() -- Get socket number of linear request.
 *
 *  SYNOPSIS
-*     int bindingLinearParseSocketOffset(const char* parameter) 
+*     int bindingLinearParseSocketOffset(const char* parameter)
 *
 *  FUNCTION
-*     In a request like "-binding linear:<amount>:<socketnr>,<corenr>" it 
-*     parses the socket number. 
+*     In a request like "-binding linear:<amount>:<socketnr>,<corenr>" it
+*     parses the socket number.
 *
 *  INPUTS
-*     const char* parameter - pointer to the binding request 
+*     const char* parameter - pointer to the binding request
 *
 *  RESULT
 *     int - if a value >= 0 then this reflects the socket number
 *           if a value < 0 then there was a parsing error or no socket number was given
 *
 *  NOTES
-*     MT-NOTE: bindingLinearParseSocketOffset() is not MT safe 
+*     MT-NOTE: bindingLinearParseSocketOffset() is not MT safe
 *
 *******************************************************************************/
 int binding_linear_parse_socket_offset(const char* parameter)
@@ -319,7 +319,7 @@ int binding_linear_parse_socket_offset(const char* parameter)
          /* fetch first number (if any) */
          if (sge_strtok(NULL, ":") != NULL) {
             char* offset = sge_strtok(NULL, ",");
-            if (offset != NULL) { 
+            if (offset != NULL) {
                if (is_digit(offset, ',')) {
                   /* offset points to <socket> */
                   return atoi(offset);
@@ -331,7 +331,7 @@ int binding_linear_parse_socket_offset(const char* parameter)
          }
       }
    }
-   
+
    /* wasn't able to parse */
    return -1;
 }
@@ -341,21 +341,21 @@ int binding_linear_parse_socket_offset(const char* parameter)
 *     bindingLinearParseCoreOffset() -- Get core number of linear request.
 *
 *  SYNOPSIS
-*     int bindingLinearParseCoreOffset(const char* parameter) 
+*     int bindingLinearParseCoreOffset(const char* parameter)
 *
 *  FUNCTION
-*     In a request like "-binding linear:<amount>:<socketnr>,<corenr>" it 
-*     parses the core number. 
+*     In a request like "-binding linear:<amount>:<socketnr>,<corenr>" it
+*     parses the core number.
 *
 *  INPUTS
-*     const char* parameter - pointer to the binding request 
+*     const char* parameter - pointer to the binding request
 *
 *  RESULT
-*     int - if a value >= 0 then this reflects the core number 
+*     int - if a value >= 0 then this reflects the core number
 *           if a value < 0 then there was a parsing error or no core number was given
 *
 *  NOTES
-*     MT-NOTE: bindingLinearParseCoreOffset() is not MT safe 
+*     MT-NOTE: bindingLinearParseCoreOffset() is not MT safe
 *
 *******************************************************************************/
 int binding_linear_parse_core_offset(const char* parameter)
@@ -380,40 +380,40 @@ int binding_linear_parse_core_offset(const char* parameter)
          }
       }
    }
-  
+
    /* wasn't able to parse */
    return -1;
 }
 
 /****** sge_binding_hlp/binding_parse_type() ***********************************
 *  NAME
-*     binding_parse_type() -- Parses binding type out of binding string. 
+*     binding_parse_type() -- Parses binding type out of binding string.
 *
 *  SYNOPSIS
-*     binding_type_t binding_parse_type(const char* parameter) 
+*     binding_type_t binding_parse_type(const char* parameter)
 *
 *  FUNCTION
-*     The execution daemon communicates with the shepherd with the config 
-*     file. This function parses the type of binding out of the specific 
-*     binding string from the config file. In case of binding type "set" 
-*     there is no special prefix in this string. In case of "environment" 
-*     the "env_" prefix in within the string. In case of setting the 
+*     The execution daemon communicates with the shepherd with the config
+*     file. This function parses the type of binding out of the specific
+*     binding string from the config file. In case of binding type "set"
+*     there is no special prefix in this string. In case of "environment"
+*     the "env_" prefix in within the string. In case of setting the
 *     rankfile the "pe_" prefix can be found in this string.
 *
 *  INPUTS
-*     const char* parameter - The binding string from the config file. 
+*     const char* parameter - The binding string from the config file.
 *
 *  RESULT
-*     binding_type_t - The type of binding. 
+*     binding_type_t - The type of binding.
 *
 *  NOTES
-*     MT-NOTE: binding_parse_type() is MT safe 
+*     MT-NOTE: binding_parse_type() is MT safe
 *
 *******************************************************************************/
 binding_type_t binding_parse_type(const char* parameter)
 {
    binding_type_t type = BINDING_TYPE_SET;
-   
+
    if (strstr(parameter, "env_") != NULL) {
       type = BINDING_TYPE_ENV;
    } else if (strstr(parameter, "pe_") != NULL) {
@@ -426,31 +426,31 @@ binding_type_t binding_parse_type(const char* parameter)
 
 /****** sge_binding_hlp/binding_explicit_has_correct_syntax() *********************
 *  NAME
-*     binding_explicit_has_correct_syntax() -- Check if parameter has correct syntax. 
+*     binding_explicit_has_correct_syntax() -- Check if parameter has correct syntax.
 *
 *  SYNOPSIS
-*     bool binding_explicit_has_correct_syntax(const char* parameter) 
+*     bool binding_explicit_has_correct_syntax(const char* parameter)
 *
 *  FUNCTION
-*     This function checks if the given string is a valid argument for the 
-*     -binding parameter which provides a list of socket, cores which have 
+*     This function checks if the given string is a valid argument for the
+*     -binding parameter which provides a list of socket, cores which have
 *     to be selected explicitly.
-* 
+*
 *     The accepted syntax is: "explicit:[1-9][0-9]*,[1-9][0-9]*(:[1-9][0-9]*,[1-9][0-9]*)*"
 *
 *     This is used from parse_qsub.c.
 *
 *  INPUTS
-*     const char* parameter - A string with the parameter. 
+*     const char* parameter - A string with the parameter.
 *
 *  RESULT
 *     bool - True if the parameter has the expected syntax.
 *
 *  NOTES
-*     MT-NOTE: binding_explicit_has_correct_syntax() is not MT safe 
+*     MT-NOTE: binding_explicit_has_correct_syntax() is not MT safe
 *
 *******************************************************************************/
-bool binding_explicit_has_correct_syntax(const char* parameter, dstring* error) 
+bool binding_explicit_has_correct_syntax(const char* parameter, dstring* error)
 {
    int amount;
 
@@ -464,7 +464,7 @@ bool binding_explicit_has_correct_syntax(const char* parameter, dstring* error)
       char* socket = NULL;
       char* core   = NULL;
 
-      /* first socket,core is mandatory */ 
+      /* first socket,core is mandatory */
       if ((socket = sge_strtok(NULL, ",")) == NULL) {
          /* we have no first socket number */
          sge_dstring_sprintf(error, "%s", MSG_SYN_EXPLICIT_NOPAIR);
@@ -489,7 +489,7 @@ bool binding_explicit_has_correct_syntax(const char* parameter, dstring* error)
       }
 
       do {
-         /* get socket number */ 
+         /* get socket number */
          if ((socket = sge_strtok(NULL, ",")) != NULL) {
             /* check if <socket> begins with a digit */
             if (!is_digit(socket, ',')) {
@@ -503,15 +503,15 @@ bool binding_explicit_has_correct_syntax(const char* parameter, dstring* error)
                sge_dstring_sprintf(error, "%s", MSG_SYN_EXPLICIT_NOCOREFORSOCKET);
                return false;
             }
-            
+
             /* check if <core> is a number */
             if (!is_digit(core, ':')) {
                sge_dstring_sprintf(error, "%s", MSG_SYN_EXPLICIT_COREISNONUMBER);
                return false;
             }
 
-         } /* end if <socket> */ 
-      } while (socket != NULL);  /* we try to continue with the next socket if possible */ 
+         } /* end if <socket> */
+      } while (socket != NULL);  /* we try to continue with the next socket if possible */
 
    } else {
       /* this should not be reachable because of the pre-check */
@@ -520,7 +520,7 @@ bool binding_explicit_has_correct_syntax(const char* parameter, dstring* error)
 
    /* check if there are <socket,core> pairs requested multiple times */
    amount = get_explicit_number(parameter, true);
-  
+
    if (check_explicit_binding_string(parameter, amount, true) == false) {
       sge_dstring_sprintf(error, "%s", MSG_SYN_EXPLICIT_PAIRSNOTUNIQUE);
       return false;
@@ -531,26 +531,26 @@ bool binding_explicit_has_correct_syntax(const char* parameter, dstring* error)
 
 /****** sge_binding_hlp/binding_striding_parse_first_core() ************************
 *  NAME
-*     binding_striding_parse_first_core() -- Parses core number from command line. 
+*     binding_striding_parse_first_core() -- Parses core number from command line.
 *
 *  SYNOPSIS
-*     int binding_striding_parse_first_core(const char* parameter) 
+*     int binding_striding_parse_first_core(const char* parameter)
 *
 *  FUNCTION
-*     Parses the core number from command line in which to start binding 
-*     in "striding" case. 
+*     Parses the core number from command line in which to start binding
+*     in "striding" case.
 *
 *     -binding striding:<amount>:<stepsize>:<socket>,<core>
 *
 *  INPUTS
-*     const char* parameter - Pointer to first character of CL string. 
+*     const char* parameter - Pointer to first character of CL string.
 *
 *  RESULT
 *     int - -1 in case the string is corrupt or core number is not set
 *           >= 0 in case the core number could parsed successfully.
 *
 *  NOTES
-*     MT-NOTE: binding_striding_parse_first_core() is not MT safe 
+*     MT-NOTE: binding_striding_parse_first_core() is not MT safe
 *
 *******************************************************************************/
 int binding_striding_parse_first_core(const char* parameter)
@@ -565,17 +565,17 @@ int binding_striding_parse_first_core(const char* parameter)
             if (sge_strtok(NULL, ":") != NULL) {
                /* fetch first <socket> */
                if (sge_strtok(NULL, ",") != NULL) {
-                  /* fetch first <core> */ 
+                  /* fetch first <core> */
                   char* first_core = NULL;
                   /* end usually with line end (":" in case of config file) */
-                  if ((first_core = sge_strtok(NULL, ":")) != NULL 
+                  if ((first_core = sge_strtok(NULL, ":")) != NULL
                         && is_digit(first_core, ' ')) {
                      return atoi(first_core);
-                  } 
+                  }
                }
             }
          }
-      }   
+      }
    }
 
    return -1;
@@ -584,26 +584,26 @@ int binding_striding_parse_first_core(const char* parameter)
 
 /****** sge_binding_hlp/binding_striding_parse_first_socket() **********************
 *  NAME
-*     binding_striding_parse_first_socket() -- Parses the socket to begin binding on. 
+*     binding_striding_parse_first_socket() -- Parses the socket to begin binding on.
 *
 *  SYNOPSIS
-*     int binding_striding_parse_first_socket(const char* parameter) 
+*     int binding_striding_parse_first_socket(const char* parameter)
 *
 *  FUNCTION
 *     Parses the "striding:" parameter string for the socket number.
 *
-*     The string is expected to have following syntax: 
-*    
+*     The string is expected to have following syntax:
+*
 *           "striding:<amount>:<stepsize>[:<socket>,<core>]"
 *
 *  INPUTS
-*     const char* parameter - Points to the string with the query. 
+*     const char* parameter - Points to the string with the query.
 *
 *  RESULT
 *     int - Returns the socket number in case it could be parsed otherwise -1
 *
 *  NOTES
-*     MT-NOTE: binding_striding_parse_first_socket() is not MT safe 
+*     MT-NOTE: binding_striding_parse_first_socket() is not MT safe
 *
 *******************************************************************************/
 int binding_striding_parse_first_socket(const char* parameter)
@@ -616,19 +616,19 @@ int binding_striding_parse_first_socket(const char* parameter)
          if (sge_strtok(NULL, ":") != NULL) {
             /* fetch stepsize */
             if (sge_strtok(NULL, ":") != NULL) {
-               /* fetch first socket */ 
+               /* fetch first socket */
                char* first_socket = NULL;
-               if ((first_socket = sge_strtok(NULL, ",")) != NULL) { 
+               if ((first_socket = sge_strtok(NULL, ",")) != NULL) {
                   if (is_digit(first_socket, ',')) {
                      return atoi(first_socket);
                   } else {
                      /* socket number is given but is not a number */
                      return -2;
                   }
-               } 
+               }
             }
          }
-      }   
+      }
    }
 
    return -1;
@@ -645,12 +645,12 @@ int binding_striding_parse_first_socket(const char* parameter)
 *  FUNCTION
 *     Parses the number of cores to bind to out of "striding:" parameter string.
 *
-*     The string is expected to have following syntax: 
-*    
+*     The string is expected to have following syntax:
+*
 *           "striding:<amount>:<stepsize>[:<socket>,<core>]"
 *
 *  INPUTS
-*     const char* parameter - Points to the string with the query. 
+*     const char* parameter - Points to the string with the query.
 *
 *  RESULT
 *     int - Returns the number of cores to bind to otherwise -1.
@@ -664,14 +664,14 @@ int binding_striding_parse_number(const char* parameter)
    /* striding:<amount>:<step-size>:[starting-socket,starting-core] */
 
    if (parameter != NULL && strstr(parameter, "striding") != NULL) {
-      
+
       /* fetch "striding:" */
       if (sge_strtok(parameter, ":") != NULL) {
          char* amount = NULL;
 
-         if ((amount = sge_strtok(NULL, ":")) != NULL 
+         if ((amount = sge_strtok(NULL, ":")) != NULL
                && is_digit(amount, ':')) {
-            /* check if step size if given */ 
+            /* check if step size if given */
             char* stepsize = sge_strtok(NULL, ":");
             if (is_digit(stepsize, ':')) {
                /* get the number from amount */
@@ -687,41 +687,41 @@ int binding_striding_parse_number(const char* parameter)
 
 /****** sge_binding_hlp/binding_striding_parse_step_size() *************************
 *  NAME
-*     binding_striding_parse_step_size() -- Parses the step size out of the "striding" query. 
+*     binding_striding_parse_step_size() -- Parses the step size out of the "striding" query.
 *
 *  SYNOPSIS
-*     int binding_striding_parse_step_size(const char* parameter) 
+*     int binding_striding_parse_step_size(const char* parameter)
 *
 *  FUNCTION
-*     Parses the step size for the core binding strategy "striding" out of the 
+*     Parses the step size for the core binding strategy "striding" out of the
 *     query.
-* 
-*     The query string is expected to have following syntax: 
-*    
+*
+*     The query string is expected to have following syntax:
+*
 *           "striding:<amount>:<stepsize>[:<socket>,<core>]"
 *
 *  INPUTS
-*     const char* parameter - Points to the string with the query. 
+*     const char* parameter - Points to the string with the query.
 *
 *  RESULT
-*     int - Returns the step size or -1 when it could not been parsed. 
+*     int - Returns the step size or -1 when it could not been parsed.
 *
 *  NOTES
-*     MT-NOTE: binding_striding_parse_step_size() is not MT safe 
+*     MT-NOTE: binding_striding_parse_step_size() is not MT safe
 *
 *******************************************************************************/
 int binding_striding_parse_step_size(const char* parameter)
 {
-   /* striding:<amount>:<step-size>:  */ 
+   /* striding:<amount>:<step-size>:  */
    if (parameter != NULL && strstr(parameter, "striding") != NULL) {
       /* fetch "striding:" */
       if (sge_strtok(parameter, ":") != NULL) {
          if (sge_strtok(NULL, ":") != NULL) {
             /* fetch step size */
             char* stepsize = NULL;
-            if ((stepsize = sge_strtok(NULL, ":")) != NULL 
+            if ((stepsize = sge_strtok(NULL, ":")) != NULL
                   && is_digit(stepsize, ':')) {
-                  /* the step size must be followed by " " or ":" or "\0" 
+                  /* the step size must be followed by " " or ":" or "\0"
                      in order to avoid garbage like "striding:2:0,0" */
                   /* return step size */
                   return atoi(stepsize);
@@ -729,24 +729,24 @@ int binding_striding_parse_step_size(const char* parameter)
          }
       }
    }
-   
+
    /* in default case take each core */
    return -1;
 }
 
 /****** uti/binding_hlp/binding_get_topology_for_job() ********************
 *  NAME
-*     binding_get_topology_for_job() -- Returns topology string. 
+*     binding_get_topology_for_job() -- Returns topology string.
 *
 *  SYNOPSIS
 *     const char *
 *     binding_get_topology_for_job(const char *binding_result)
 *
 *  FUNCTION
-*     Returns the topology string of a host where the cores are 
+*     Returns the topology string of a host where the cores are
 *     marked with lowercase letters for those cores that were
 *     "bound" to a certain job.
-*     
+*
 *     It is assumed the 'binding_result' parameter that is
 *     passed to this function was previously returned by
 *     create_binding_strategy_string()
@@ -776,14 +776,14 @@ binding_get_topology_for_job(const char* binding_result) {
 
 /****** sge_binding_hlp/topology_string_to_socket_core_lists() *****************
 *  NAME
-*     topology_string_to_socket_core_lists() -- Converts a topology into socket,core lists. 
+*     topology_string_to_socket_core_lists() -- Converts a topology into socket,core lists.
 *
 *  SYNOPSIS
-*     bool topology_string_to_socket_core_lists(const char* topology, int** 
-*     sockets, int** cores, int* amount) 
+*     bool topology_string_to_socket_core_lists(const char* topology, int**
+*     sockets, int** cores, int* amount)
 *
 *  FUNCTION
-*     Converts a topology string into lists of cores and sockets which are marked 
+*     Converts a topology string into lists of cores and sockets which are marked
 *     as beeing used and returns them.
 *
 *  INPUTS
@@ -791,18 +791,18 @@ binding_get_topology_for_job(const char* binding_result) {
 *
 *  OUTPUTS
 *     int** sockets        - Pointer to the location of the socket array.
-*     int** cores          - Pointer to the location of the core array. 
-*     int* amount          - Length of the arrays.  
+*     int** cores          - Pointer to the location of the core array.
+*     int* amount          - Length of the arrays.
 *
 *  RESULT
 *     bool - false when problems occured true otherwise
 *
 *  NOTES
-*     MT-NOTE: topology_string_to_socket_core_lists() is MT safe 
+*     MT-NOTE: topology_string_to_socket_core_lists() is MT safe
 *
 *******************************************************************************/
 bool
-topology_string_to_socket_core_lists(const char* topology, int** sockets, 
+topology_string_to_socket_core_lists(const char* topology, int** sockets,
                                      int** cores, int* amount) {
    bool retval = true;
 
@@ -810,12 +810,12 @@ topology_string_to_socket_core_lists(const char* topology, int** sockets,
    int current_core   = -1;
 
    *amount = 0;
-   
+
    if (topology == NULL || *sockets != NULL || *cores != NULL) {
       /* we expect to have clean input */
       retval = false;
    } else {
-   
+
       while (*topology != '\0') {
 
          if (*topology == 'S' || *topology == 's') {
@@ -874,7 +874,7 @@ get_explicit_number(const char* expl, const bool with_explicit_prefix) {
 
    if (expl == NULL) {
       return amount;
-   }   
+   }
 
    pair = sge_strtok_r(expl, ":", &context);
 
@@ -886,8 +886,8 @@ get_explicit_number(const char* expl, const bool with_explicit_prefix) {
    if (with_explicit_prefix == false) {
       /* it begins with a pair */
       amount++;
-   }   
-  
+   }
+
    while (sge_strtok_r(NULL, ":", &context) != NULL) {
       amount++;
    }
@@ -905,7 +905,7 @@ get_explicit_number(const char* expl, const bool with_explicit_prefix) {
 *     bool check_explicit_binding_string(const char* expl, const int amount)
 *
 *  FUNCTION
-*     Checks binding string for duplicate <socket,core> pairs. Works 
+*     Checks binding string for duplicate <socket,core> pairs. Works
 *     also when the first pair is the "explicit" string.
 *
 *  INPUTS
@@ -923,17 +923,17 @@ get_explicit_number(const char* expl, const bool with_explicit_prefix) {
 *     sge_binding_hlp/get_explicit_number()
 *******************************************************************************/
 bool
-check_explicit_binding_string(const char* expl, const int amount, 
+check_explicit_binding_string(const char* expl, const int amount,
                               const bool with_explicit_prefix)
 {
    bool success = true;
    struct saved_vars_s* context = NULL;
-   
+
    /* pointer to the first position of all <socket,core> pairs */
    int pair_number = 0;
    char* pairs[amount];
    char* pair = NULL;
-   
+
    if (expl == NULL || amount == 0) {
       return false;
    }
@@ -943,19 +943,19 @@ check_explicit_binding_string(const char* expl, const int amount,
       pair = sge_strtok_r(expl, ":", &context);
       if (pair == NULL) {
          success = false;
-      }   
+      }
    }
 
    /* get pointer to first pair */
    if (success == true) {
-      if (with_explicit_prefix == true) {  
+      if (with_explicit_prefix == true) {
          pair = sge_strtok_r(NULL, ":", &context);
       } else {
          pair = sge_strtok_r(expl, ":", &context);
       }
       if (pair == NULL) {
          success = false;
-      }   
+      }
    }
 
    /* store pointer to first <socket,core> pair */
@@ -1002,26 +1002,26 @@ check_explicit_binding_string(const char* expl, const int amount,
 
 /****** sge_binding_hlp/is_digit() *********************************************
 *  NAME
-*     is_digit() -- Checks if char array consists of digits. 
+*     is_digit() -- Checks if char array consists of digits.
 *
 *  SYNOPSIS
-*     static bool is_digit(const char* position, const char stopchar) 
+*     static bool is_digit(const char* position, const char stopchar)
 *
 *  FUNCTION
-*     Checks if the character array contains only digits till the end of the 
-*     array or to a given stop character. If there is no digit found or 
-*     the input pointer is a null pointer 'false' is returned. 
+*     Checks if the character array contains only digits till the end of the
+*     array or to a given stop character. If there is no digit found or
+*     the input pointer is a null pointer 'false' is returned.
 *     The input pointer have to point to the first digit of a number.
 *
 *  INPUTS
-*     const char* position - pointer to the character array 
-*     const char stopchar  - stop scanning at this parameter 
+*     const char* position - pointer to the character array
+*     const char stopchar  - stop scanning at this parameter
 *
 *  RESULT
-*     static bool - true if a number is found false if not  
+*     static bool - true if a number is found false if not
 *
 *  NOTES
-*     MT-NOTE: is_digit() is MT safe 
+*     MT-NOTE: is_digit() is MT safe
 *
 *******************************************************************************/
 static bool is_digit(const char* position, const char stopchar) {

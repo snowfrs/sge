@@ -489,7 +489,8 @@ find_stop_ed(void)
 {
     struct process *pp, *retp;
     const char *ep, *vp;
-    char *cp, *p;
+    char *cp;
+    const char *p;
     size_t epl, vpl;
     int pstatus;
 
@@ -531,14 +532,14 @@ find_stop_ed(void)
 
 	    p = short2str(pp->p_command);
 	    /* get the first word */
-	    for (cp = p; *cp && !isspace((unsigned char) *cp); cp++)
+	    for (cp = (char *)p; *cp && !isspace((unsigned char) *cp); cp++)
 		continue;
 	    *cp = '\0';
 		
-	    if ((cp = strrchr(p, '/')) != NULL)	/* and it has a path */
+	    if ((cp = (char *)strrchr(p, '/')) != NULL)	/* and it has a path */
 		cp = cp + 1;		/* then we want only the last part */
 	    else
-		cp = p;			/* else we get all of it */
+		cp = (char *)p;			/* else we get all of it */
 
 	    /* if we find either in the current name, fg it */
 	    if (strncmp(ep, cp, epl) == 0 ||

@@ -164,7 +164,7 @@ const char*
 expand_path(const char *in_path, u_long32 job_id, u_long32 ja_task_id,
             const char *job_name, const char *user, const char *host)
 {
-   char *t;
+   const char *t;
    const char *s;
    static char exp_path[SGE_PATH_MAX];
    
