@@ -287,3 +287,13 @@ target_include_directories(uidgid PRIVATE
 	../common
 	../libs/uti
 )
+add_executable(fstype
+	fstype.c
+)
+target_include_directories(fstype PRIVATE
+	../common
+	../libs/uti
+)
+target_link_libraries(fstype PRIVATE
+	uti
+)

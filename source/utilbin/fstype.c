@@ -43,6 +43,7 @@
 #  include <sys/vfs.h>
 #  include "sge_string.h"
 #  include <mntent.h>
+#  include <paths.h>
 #else
 #  include <sys/types.h>
 #  include <sys/statvfs.h>

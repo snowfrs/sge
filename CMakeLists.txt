@@ -96,6 +96,7 @@ install(
 		checkprog
 		checkuser
 		filestat
+		fstype
 		gethostbyaddr
 		gethostbyname
 		gethostname
